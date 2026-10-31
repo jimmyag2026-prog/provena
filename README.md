@@ -10,6 +10,11 @@ whoever issued it. Agents are first-class users: an MCP server (`provena mcp`), 
 contract for the CLI (`provena --json …`, [`docs/spec/cli-contract-v1.md`](docs/spec/cli-contract-v1.md))
 and a Python SDK.
 
+Provena is part of [Spark Science](https://sparkscience.xyz/provena/), an AI-for-science community
+of researchers and developers. A public trial hub runs at
+[jimmyresearch.com/provena](https://jimmyresearch.com/provena/)
+([details](docs/integrations/trial-hub.md)).
+
 Provena records every dataset, protocol and processing step of an experiment as a signed entry
 in an append-only Merkle log. Content is encrypted on your machine; the hub only ever sees
 ciphertext, hashes and signatures. Anyone holding a *proof bundle* (`.pvb`) can check — offline,
