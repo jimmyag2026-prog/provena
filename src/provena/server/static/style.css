@@ -1,0 +1,75 @@
+:root {
+  --bg: #fbfaf7; --surface: #ffffff; --text: #1d1f23; --muted: #6a6f78; --line: #e4e1da;
+  --accent: #2f5d50; --accent-soft: #e5efe9; --bad: #a3322b; --bad-soft: #f8e7e5;
+  --warn: #8a6100; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a; --surface: #1b1e23; --text: #e8e6e1; --muted: #9aa0a8; --line: #2c3037;
+    --accent: #7cc4a8; --accent-soft: #1f3a31; --bad: #f08a80; --bad-soft: #3a2220; --warn: #e3b55a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+main { max-width: 960px; margin: 0 auto; padding: 40px 16px 80px; }
+header.top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+header.top span { min-width: 0; overflow-wrap: anywhere; }
+main, .card { min-width: 0; }
+h1.mono, .mono { overflow-wrap: anywhere; }
+.brand { font-weight: 650; letter-spacing: .02em; color: var(--text); text-decoration: none; }
+.muted { color: var(--muted); }
+h1 { font-size: 2rem; line-height: 1.2; margin: 40px 0 8px; font-weight: 650; }
+h2 { font-size: 1.1rem; margin: 40px 0 12px; }
+.tagline { color: var(--muted); margin: 0 0 8px; }
+.mono, code { font-family: var(--mono); font-size: .86em; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 20px; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line);
+  vertical-align: top; }
+th { color: var(--muted); font-weight: 500; }
+.table-wrap { overflow-x: auto; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .8rem;
+  background: var(--accent-soft); color: var(--accent); }
+#drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 32px 20px;
+  text-align: center; cursor: pointer; background: var(--surface); }
+#drop.over { border-color: var(--accent); }
+.result { margin-top: 16px; }
+.result.ok { border-color: var(--accent); }
+.result.bad { border-color: var(--bad); background: var(--bad-soft); }
+.result ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+.result li { margin: 6px 0; padding-left: 22px; position: relative; overflow-wrap: anywhere; }
+.result li::before { position: absolute; left: 0; }
+.result li.fact::before { content: "✓"; color: var(--accent); }
+.result li.note::before { content: "!"; color: var(--warn); font-weight: 700; }
+.result li.err::before { content: "✗"; color: var(--bad); }
+.verdict { font-weight: 650; }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+.graph-wrap { overflow-x: auto; padding: 8px; }
+svg.lineage text { font: 11px var(--mono); text-anchor: middle; fill: var(--text); }
+svg.lineage rect { stroke-width: 1.2; }
+svg.lineage .g-entity rect { fill: var(--surface); stroke: var(--line); }
+svg.lineage .g-plan rect { fill: var(--accent-soft); stroke: var(--accent); }
+svg.lineage .g-external rect { fill: var(--bg); stroke: var(--accent); stroke-dasharray: 1 3; }
+svg.lineage .g-activity rect { fill: var(--bg); stroke: var(--muted); stroke-dasharray: 3 2; }
+svg.lineage .g-edge { fill: none; stroke: var(--muted); stroke-width: 1.2; opacity: .7; }
+form.search { display: flex; gap: 8px; margin: 0 0 12px; flex-wrap: wrap; }
+form.search input { flex: 1 1 220px; min-width: 0; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+form.search button { padding: 8px 14px; border: 1px solid var(--accent); border-radius: 8px;
+  background: var(--accent); color: var(--surface); font: inherit; cursor: pointer; }
+form.search input:focus-visible, form.search button:focus-visible { outline: 2px solid var(--accent);
+  outline-offset: 2px; }
+pre.code { overflow: auto; font: 13px/1.5 var(--mono); white-space: pre; }
+.readme { margin-top: 24px; } .readme h2, .readme h3 { margin-top: 12px; }
+.verdict-ok { border-left: 3px solid var(--good, #2a7); padding-left: .6em; }
+.verdict-fail { border-left: 3px solid var(--bad); padding-left: .6em; }
+.verdict-unchecked { border-left: 3px solid var(--muted, #999); padding-left: .6em; }
+span.bad { color: var(--bad); }
+.verdict-ok-open { border-left: 3px solid var(--good, #2a7); padding-left: .6em; }
+.verdict-partial { border-left: 3px solid var(--muted, #999); padding-left: .6em; }

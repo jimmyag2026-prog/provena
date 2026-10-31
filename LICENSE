@@ -1,0 +1,43 @@
+Provena License
+
+Copyright (c) 2026 The Provena Authors (https://github.com/jimmyag2026-prog/provena)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. Notice. The above copyright notice and this permission notice shall be included in all copies
+   or substantial portions of the Software.
+
+2. Hub as a Service. "Hub as a Service" means operating the Software's hub server (the code under
+   src/provena/server/, or a derivative of it) so that third parties can create projects on it,
+   store or sequence ledger entries on it, or obtain its receipts, tree heads, anchors or
+   cosignatures. If the Licensee, together with its affiliates, receives more than 1 million US
+   dollars (or the equivalent in other currencies) in total over any consecutive 12 months from
+   Hub as a Service, or from products or services of which Hub as a Service is a material part,
+   the Licensee must obtain a separate agreement from the copyright holders before continuing
+   such commercial use.
+
+3. Attribution. If the Software, or a derivative of it, is used in a commercial product or service
+   that has more than 1 million monthly active users or more than 1 million US dollars (or the
+   equivalent in other currencies) in monthly revenue, the Licensee shall prominently display
+   "Provena" in the user interface of that product or service, and shall not use the name
+   "Provena" for a derivative in a way that suggests it is the original.
+
+4. Exemptions. Sections 2 and 3 do not apply to (a) use of the Software, including running a hub,
+   by a non-profit research or educational institution for its own research, teaching or
+   challenges; (b) internal use that does not make the Software or its hub available to third
+   parties; or (c) running the client, the verifiers (Python and JavaScript), the SDK, the MCP
+   server or the command-line tools, including to read, write to or verify any hub.
+
+5. Verifiers. Nothing in this license restricts anyone from running, copying, studying or
+   redistributing the verifiers (src/provena/core/ and src/provena/server/static/verifier.js) to
+   check proofs produced with the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

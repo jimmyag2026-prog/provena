@@ -1,0 +1,88 @@
+name: trial-witness
+# An external witness for the trial hub (docs/integrations/trial-hub.md): runs on GitHub's
+# machines with its own key (only in this repository's secrets), checks that every public
+# project's log only grows, and cosigns its head. A fork or rollback fails the run, which
+# GitHub reports to the repository owner. State (the last head seen per project) lives on the
+# `witness-state` branch, never on the hub it watches.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: trial-witness
+  cancel-in-progress: false
+env:
+  HUB: https://jimmyresearch.com/provena
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - id: keys
+        env:
+          KEY: ${{ secrets.PROVENA_WITNESS_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::notice::PROVENA_WITNESS_KEY is not set: the witness is not configured yet"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.keys.outputs.ready == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - if: steps.keys.outputs.ready == 'true'
+        uses: astral-sh/setup-uv@v3
+      - if: steps.keys.outputs.ready == 'true'
+        run: uv venv /tmp/w && uv pip install -p /tmp/w/bin/python ".[client]"
+      - if: steps.keys.outputs.ready == 'true'
+        name: restore state
+        # first run: no branch yet, and no state file at all (an empty one is not valid JSON)
+        run: |
+          if git show origin/witness-state:state.json > "$RUNNER_TEMP/st.json" 2>/dev/null; then
+            mv "$RUNNER_TEMP/st.json" "$RUNNER_TEMP/state.json"
+          else
+            rm -f "$RUNNER_TEMP/st.json"
+          fi
+      - if: steps.keys.outputs.ready == 'true'
+        id: cosign
+        name: check and cosign every public project
+        env:
+          KEY: ${{ secrets.PROVENA_WITNESS_KEY }}
+          PASS: ${{ secrets.PROVENA_WITNESS_PASSPHRASE }}
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/home/agents"
+          printf '%s' "$KEY" > "$RUNNER_TEMP/home/agents/trial-witness.key.json"
+          cp deploy/witness/trial-witness.card.json "$RUNNER_TEMP/home/agents/"
+          printf '%s' "$PASS" > "$RUNNER_TEMP/pass"
+          export PROVENA_HOME="$RUNNER_TEMP/home" PROVENA_PASSPHRASE_FILE="$RUNNER_TEMP/pass"
+          pids=$(curl -sf "$HUB/v1/catalog" | python3 -c 'import sys, json; print(" ".join(p["project"] for p in json.load(sys.stdin)["projects"]))')
+          fail=0
+          for p in $pids; do
+            /tmp/w/bin/provena --agent trial-witness witness "$HUB" "$p" \
+              --state "$RUNNER_TEMP/state.json" || { echo "::error::project $p: refused to cosign"; fail=1; }
+          done
+          rm -f "$RUNNER_TEMP/pass" "$RUNNER_TEMP/home/agents/trial-witness.key.json"
+          echo "fail=$fail" >> "$GITHUB_OUTPUT"
+      - if: always() && steps.keys.outputs.ready == 'true'
+        name: save state
+        run: |
+          [ -s "$RUNNER_TEMP/state.json" ] || exit 0
+          git config user.name "provena-trial-witness"
+          git config user.email "noreply@github.com"
+          git worktree add --detach "$RUNNER_TEMP/st" 2>/dev/null
+          cd "$RUNNER_TEMP/st"
+          if git rev-parse -q --verify origin/witness-state >/dev/null; then
+            git checkout -q -B witness-state origin/witness-state
+          else
+            git checkout -q --orphan witness-state && git rm -rqf . || true
+          fi
+          cp "$RUNNER_TEMP/state.json" state.json
+          git add state.json
+          git diff --cached --quiet || git commit -qm "witness state $(date -u +%FT%TZ)"
+          git push -q origin witness-state
+      - if: steps.keys.outputs.ready == 'true' && steps.cosign.outputs.fail == '1'
+        run: exit 1

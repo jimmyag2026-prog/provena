@@ -1,0 +1,184 @@
+{
+ "$comment": "Shared rule tables of the ledger state machine (ADR 0009). core/state.py and server/static/verifier.js must equal this file (tests/test_rules_single_source.py).",
+ "ATTEST_TYPES": [
+  "review",
+  "replicate",
+  "calibration",
+  "endorse",
+  "dispute",
+  "capture",
+  "operator"
+ ],
+ "BODY_FIELDS": {
+  "activity": [
+   "epoch",
+   "external",
+   "generated",
+   "plan",
+   "used"
+  ],
+  "attest": [
+   "epoch",
+   "target",
+   "type",
+   "verdict"
+  ],
+  "entity": [
+   "capture",
+   "cid",
+   "commitment",
+   "dek",
+   "epoch",
+   "size"
+  ],
+  "genesis": [
+   "epoch",
+   "members",
+   "meta",
+   "policy",
+   "wraps"
+  ],
+  "grant": [
+   "target",
+   "to",
+   "wrap"
+  ],
+  "key": [
+   "action",
+   "card",
+   "epoch",
+   "epoch_wraps",
+   "wraps"
+  ],
+  "member": [
+   "action",
+   "agent",
+   "card",
+   "epoch",
+   "role",
+   "wraps"
+  ],
+  "meta": [
+   "description",
+   "license",
+   "tags",
+   "title"
+  ],
+  "plan": [
+   "cid",
+   "commitment",
+   "dek",
+   "epoch",
+   "size"
+  ],
+  "redact": [
+   "reason",
+   "target"
+  ],
+  "reveal": [
+   "dek",
+   "name",
+   "plain_sha256",
+   "salt",
+   "target"
+  ]
+ },
+ "BODY_FIELDS_V2": {
+  "activity": [
+   "commitment",
+   "epoch",
+   "external",
+   "generated",
+   "plan",
+   "status",
+   "used"
+  ],
+  "attest": [
+   "epoch",
+   "target",
+   "type",
+   "verdict"
+  ],
+  "entity": [
+   "capture",
+   "cid",
+   "commitment",
+   "dek",
+   "epoch",
+   "size"
+  ],
+  "genesis": [
+   "epoch",
+   "members",
+   "meta",
+   "policy",
+   "wraps"
+  ],
+  "grant": [
+   "target",
+   "to",
+   "wrap"
+  ],
+  "key": [
+   "action",
+   "card",
+   "epoch",
+   "epoch_wraps",
+   "wraps"
+  ],
+  "member": [
+   "action",
+   "agent",
+   "card",
+   "epoch",
+   "epoch_wraps",
+   "role",
+   "wraps"
+  ],
+  "meta": [
+   "description",
+   "license",
+   "tags",
+   "title"
+  ],
+  "plan": [
+   "cid",
+   "commitment",
+   "dek",
+   "epoch",
+   "size"
+  ],
+  "redact": [
+   "reason",
+   "target"
+  ],
+  "reveal": [
+   "dek",
+   "details",
+   "name",
+   "plain_sha256",
+   "salt",
+   "target"
+  ]
+ },
+ "META_LIMITS": {
+  "description": 4000,
+  "license": 64,
+  "title": 200
+ },
+ "ROLES": [
+  "owner",
+  "maintainer",
+  "contributor",
+  "reviewer",
+  "viewer"
+ ],
+ "RULES_VERSIONS": [
+  1,
+  2
+ ],
+ "STEP_STATUS": [
+  "ok",
+  "failed"
+ ]
+}

@@ -1,0 +1,31 @@
+# Provena trial hub on the DO droplet (docs: deploy/do/SETUP.md). Installed by deploy.sh.
+[Unit]
+Description=Provena Hub (trial zone, jimmyresearch.com/provena)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=provena
+Group=provena
+WorkingDirectory=/home/provena
+Environment=PROVENA_HUB_PASSPHRASE_FILE=/home/provena/hub.pass
+ExecStart=/home/provena/venv/bin/provena hub serve --data /home/provena/hub-data \
+  --host 127.0.0.1 --port 8803 --base-path /provena --behind-proxy \
+  --creators /home/provena/creators.txt --projects-per-creator 50 \
+  --tsa https://freetsa.org/tsr --anchor-interval 3600
+Restart=on-failure
+RestartSec=5
+# this droplet is production for other services: keep the hub small and contained
+MemoryMax=512M
+CPUQuota=50%
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/provena/hub-data
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

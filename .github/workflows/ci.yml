@@ -1,0 +1,52 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"   # WebCrypto Ed25519 for the browser-verifier parity tests
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync --python ${{ matrix.python }}
+      - run: uv run ruff check .
+      - run: uv run pytest -q
+  package:   # the built wheel (not the source tree) installs and runs both end-to-end demos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv build
+      - run: uv venv /tmp/pkg && uv pip install -p /tmp/pkg/bin/python "$(ls dist/*.whl)[client,server]"
+      # the core alone (no [client]/[server]) records, proves and verifies offline
+      - run: |
+          uv venv /tmp/bare && uv pip install -p /tmp/bare/bin/python "$(ls dist/*.whl)"
+          export PROVENA_HOME=/tmp/bare/home PROVENA_PASSPHRASE=x PROVENA_SCRYPT_N=1024
+          mkdir /tmp/bare/p && cd /tmp/bare/p && echo a > a.txt
+          /tmp/bare/bin/provena keygen && /tmp/bare/bin/provena init --name bare
+          /tmp/bare/bin/provena add a.txt && /tmp/bare/bin/provena prove a.txt -o a.pvb
+          /tmp/bare/bin/provena verify a.pvb
+      # agent flows: the field-test repros (docs/design/agent-ux-review.md), no terminal
+      - run: PATH=/tmp/pkg/bin:$PATH bash tests/agent_flows/solo.sh
+      - run: PATH=/tmp/pkg/bin:$PATH bash tests/agent_flows/team.sh
+      - run: PATH=/tmp/pkg/bin:$PATH bash examples/demo.sh
+      - run: PATH=/tmp/pkg/bin:$PATH bash examples/challenge_demo.sh
+      - run: PATH=/tmp/pkg/bin:$PATH bash examples/challenge_cli_demo.sh
+  sandbox-linux:   # the bubblewrap path end to end (the test job has no bwrap, so it skips these)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: sudo apt-get update && sudo apt-get install -y bubblewrap
+      # Ubuntu 24.04 blocks unprivileged user namespaces through AppArmor by default
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - run: uv sync
+      - run: uv run python -c "from provena.cli import sandbox; assert sandbox.available() == 'bwrap', sandbox.available()"
+      - run: uv run pytest -q -rs -k "sandbox" tests/test_challenge.py tests/test_cli.py tests/test_sandbox.py

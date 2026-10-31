@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "kind": "person",
+  "name": "Provena trial witness (GitHub Actions)",
+  "id": "pv1a3ejpunb26rszlgvdmhj62eusvbb2fe6c",
+  "sign": "21711adef7fa02e946338bd00a783a69836b72fe474e33cf144d0f1f75ec106d",
+  "kem": "b0838cabec88b915221a7cf312e50e3cbc4d761b1cea0845fc297cd77a55f85a",
+  "sig": "25060a07eedc2b200fc6f8191029defe9a26a894381bb6bd914ad43628625b4855b9fd64711f2584cee8be2474c21df0369f362d5e275659ba917380803fc80b"
+}

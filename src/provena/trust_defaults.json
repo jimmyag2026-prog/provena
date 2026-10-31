@@ -1,0 +1,9 @@
+{
+  "$comment": "Built-in trust (`provena trust defaults off` to drop it). The trial hub's log key and the TSA it anchors with; compare them with docs/integrations/trial-hub.md before relying on them.",
+  "logs": {
+    "pv1au5paant4hgacofid4mzitstnqlsh7bv2": "Provena trial hub, https://jimmyresearch.com/provena (since 2026-10-31)"
+  },
+  "tsas": {
+    "32e841a95cc1164101ffde41298ef2fc75c1c4372ef095e88a6bbd47dfb191fc": "freetsa.org (RFC 3161)"
+  }
+}

@@ -1,0 +1,24 @@
+# Verify a Provena proof bundle in CI and publish a badge — copy to .github/workflows/.
+# The core package verifies offline (no hub, no keys). Trust: pin the hub's log key you
+# checked out of band (never take it from the bundle you are verifying).
+name: provena-verify
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "provena @ git+https://github.com/jimmyag2026-prog/provena"
+      - run: |
+          provena --json verify results/result.pvb --require log-sequenced \
+            --trust-log "${{ vars.PROVENA_HUB_LOG_KEY }}" --badge provena-badge.svg > verdict.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: provena-verdict
+          path: |
+            verdict.json
+            provena-badge.svg
