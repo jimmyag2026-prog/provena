@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import time
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Annotated
 
@@ -121,7 +122,8 @@ def create_app(data_dir: Path, key: AgentKey, card: dict, *, anchor_provider=Non
                database: str | None = None, reanchor_days: float | None = None,
                creators_file: Path | None = None,
                projects_per_creator: int | None = None, base_path: str = "",
-               policy_file: Path | None = None) -> FastAPI:
+               policy_file: Path | None = None, unlisted: Iterable[str] = (),
+               unlisted_file: Path | None = None) -> FastAPI:
     """Build the hub app. anchor_interval > 0 runs anchoring in the background every N s."""
     hub = Hub(Storage(data_dir, blob_store, database), key, card, anchor_provider)
     hub.creators_file, hub.projects_per_creator = creators_file, projects_per_creator
@@ -130,6 +132,7 @@ def create_app(data_dir: Path, key: AgentKey, card: dict, *, anchor_provider=Non
 
         hub.policy = Policy(policy_file)
     hub.base_path = "/" + base_path.strip("/") if base_path.strip("/") else ""  # e.g. /provena
+    hub.unlisted, hub.unlisted_file = frozenset(unlisted), unlisted_file
     hub.reshred()  # finish any redaction whose storage delete failed earlier
     rotations = hub_rotations(data_dir)
     if rotations and rotations[-1]["new"]["id"] != card["id"]:

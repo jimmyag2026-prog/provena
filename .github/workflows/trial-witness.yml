@@ -59,7 +59,8 @@ jobs:
           cp deploy/witness/trial-witness.card.json "$RUNNER_TEMP/home/agents/"
           printf '%s' "$PASS" > "$RUNNER_TEMP/pass"
           export PROVENA_HOME="$RUNNER_TEMP/home" PROVENA_PASSPHRASE_FILE="$RUNNER_TEMP/pass"
-          pids=$(curl -sf "$HUB/v1/catalog" | python3 -c 'import sys, json; print(" ".join(p["project"] for p in json.load(sys.stdin)["projects"]))')
+          # include=unlisted: projects the operator took off the front page are public too
+          pids=$(curl -sf "$HUB/v1/catalog?include=unlisted" | python3 -c 'import sys, json; print(" ".join(p["project"] for p in json.load(sys.stdin)["projects"]))')
           fail=0
           for p in $pids; do
             /tmp/w/bin/provena --agent trial-witness witness "$HUB" "$p" \

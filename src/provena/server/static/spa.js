@@ -84,7 +84,7 @@ async function home() {
     el("h2", { text: T("Public projects", "公开项目") }), search,
     rows.length ? table([T("Project", "项目"), T("License", "许可"), T("Entries", "条目"), T("Last head", "最新树头")], rows)
       : el("p", { class: "muted", text: q ? T("No project matches.", "没有匹配的项目。") : T("No public projects yet.", "还没有公开项目。") }),
-    el("p", { class: "muted", text: T(`${cat.private} private project(s) on this hub.`, `本 Hub 另有 ${cat.private} 个私有项目。`) }),
+    el("p", { class: "muted", text: T(`${cat.private} private and ${cat.unlisted} unlisted project(s) are also sequenced here; only their tree heads are public.`, `本 Hub 另有 ${cat.private} 个私有项目和 ${cat.unlisted} 个未列出项目在此排序，只有它们的树头是公开的。`) }),
     el("h2", { text: T("What a verdict means", "结论的含义") }),
     kv(VERDICTS.map(([k, en, cn]) => [k, T(en, cn)])));
   await import("./app.js");  // the drop zone above (reads #drop, #file, #result, #trust)

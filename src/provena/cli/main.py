@@ -289,6 +289,10 @@ def build_parser() -> argparse.ArgumentParser:
                    "re-read on every creation, so edit it without restarting")
     h.add_argument("--projects-per-creator", type=int,
                    help="cap on projects created by one agent id")
+    h.add_argument("--unlisted", metavar="FILE",
+                   help="project ids (one per line, # comments) left out of the public catalog "
+                   "and its search but still served by id (not deletion); re-read on every "
+                   "listing. PROVENA_HUB_UNLISTED_PROJECTS (comma-separated) adds more")
     h.add_argument("--policy", metavar="FILE",
                    help="orgs, their agents, project and storage quotas and API keys (JSON, "
                    "re-read when it changes; see docs/DEPLOY.md)")

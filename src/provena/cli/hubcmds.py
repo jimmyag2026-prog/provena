@@ -179,6 +179,12 @@ def cmd_hub_serve(args):
             parse(json.loads(policy.read_text()))
         except (OSError, ValueError, PolicyError) as exc:
             raise CliError(f"policy file {policy}: {exc}") from None
+    unlisted_file = Path(args.unlisted).resolve() if args.unlisted else None
+    if unlisted_file is not None and not unlisted_file.is_file():
+        raise CliError(f"unlisted file {unlisted_file} does not exist")
+    from provena.server.hub import parse_project_ids
+
+    unlisted = parse_project_ids(os.environ.get("PROVENA_HUB_UNLISTED_PROJECTS", ""))
     if creators is None and policy is None and args.host not in ("127.0.0.1", "localhost", "::1"):
         print("note: anyone who can reach this hub can create projects; restrict it with "
               "--policy FILE (orgs and quotas) or --creators FILE", file=sys.stderr)
@@ -189,7 +195,7 @@ def cmd_hub_serve(args):
                                    max_projects=args.max_projects),
                      trust_forwarded_for=args.behind_proxy, creators_file=creators,
                      projects_per_creator=args.projects_per_creator, base_path=args.base_path,
-                     policy_file=policy)
+                     policy_file=policy, unlisted=unlisted, unlisted_file=unlisted_file)
     uvicorn.run(app, host=args.host, port=args.port)
 
 def _lock_data_dir(data: Path):
