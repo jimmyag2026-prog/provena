@@ -26,7 +26,9 @@ hub, independent witnesses, RFC 3161 time-stamps), order (a preregistered plan p
 result it governs), lineage, and completeness (failed runs and withdrawn data stay visible).
 **What it does not prove:** that a measurement reflects reality — see
 [`docs/design/attested-capture.md`](docs/design/attested-capture.md) for how instrument keys and
-facility co-signatures raise that bar.
+facility co-signatures raise that bar (today: C0 and C1, an instrument's own key via `provena
+capture`; the facility co-signature of C4 exists as `attest --type capture`; C2/C3 need hardware
+and are not started).
 
 ## Install
 
@@ -54,7 +56,8 @@ provena doctor                                    # is everything set up and bac
 ```
 
 Failed runs are recorded too; `provena rerun <step> --yes --attest` re-executes a recorded step
-and records whether it replicates.
+and records whether it replicates (`--sandbox` defaults to `off`; `--sandbox require` for a
+no-network, no-keys rerun).
 
 ### From Python, notebooks, instruments and AI agents
 
@@ -123,7 +126,9 @@ drag-and-drop verifier, and citation pages. See [`docs/DEPLOY.md`](docs/DEPLOY.m
   [decisions](docs/adr/) · [hub API](docs/API.md) · [bundle format](docs/spec/bundle-v1.md)
 - Designs: [attested capture](docs/design/attested-capture.md) ·
   [challenge mode](docs/design/challenge-mode.md) · [benchmarks](docs/devlog/benchmarks.md)
-- [Changelog](CHANGELOG.md)
+- [Changelog](CHANGELOG.md) · [release notes](docs/release/)
+- [Security policy](SECURITY.md) — supported versions, how to report a vulnerability
+- [Contributing](CONTRIBUTING.md) — dev setup, PR rules, where docs live
 
 ## Development
 
@@ -133,7 +138,7 @@ uv run pytest -q          # includes Python/JS verifier parity tests (needs Node
 uv run ruff check .
 ```
 
-Status: v0.2.0 (2026-10-31). Ledger rules 2 for new projects ([ADR 0009](docs/adr/0009-ledger-rules-version.md)).
+Status: v0.2.1 (2026-11-01). Ledger rules 2 for new projects ([ADR 0009](docs/adr/0009-ledger-rules-version.md)).
 Independent security reviews and agent-driven field tests ([findings](docs/design/agent-ux-review.md),
 [plan](docs/design/next-dev-plan.md)); every confirmed finding is fixed and has a regression test
 (see the changelog).
