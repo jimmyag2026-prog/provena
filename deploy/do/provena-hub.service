@@ -12,6 +12,7 @@ Environment=PROVENA_HUB_PASSPHRASE_FILE=/home/provena/hub.pass
 ExecStart=/home/provena/venv/bin/provena hub serve --data /home/provena/hub-data \
   --host 127.0.0.1 --port 8803 --base-path /provena --behind-proxy \
   --creators /home/provena/creators.txt --projects-per-creator 50 \
+  --unlisted /home/provena/unlisted.txt \
   --tsa https://freetsa.org/tsr --anchor-interval 3600
 Restart=on-failure
 RestartSec=5

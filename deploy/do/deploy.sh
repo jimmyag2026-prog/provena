@@ -28,6 +28,7 @@ new=$(g rev-parse FETCH_HEAD)
 [[ -z $(g status --porcelain) ]] || { echo "ABORT: $REPO has local changes" >&2; exit 3; }
 g merge -q --ff-only FETCH_HEAD || { echo "ABORT: not a fast-forward" >&2; exit 5; }
 chown -R root:root "$REPO" "$BARE" && chmod -R go-w "$REPO" "$BARE" && chmod -R o+rX "$REPO"
+"$VENV/bin/pip" uninstall -y -q provena >/dev/null 2>&1 || true   # pre-0.2.1 distribution name
 "$VENV/bin/pip" install -q --upgrade "$REPO[server,client]"
 cmp -s "$REPO/deploy/do/provena-hub.service" /etc/systemd/system/provena-hub.service || {
   install -m 644 "$REPO/deploy/do/provena-hub.service" /etc/systemd/system/provena-hub.service
