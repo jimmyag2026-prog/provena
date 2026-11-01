@@ -1,6 +1,6 @@
 # Phase 3 design: attested capture (instruments and AI agents)
 
-**Status: draft for decision** · 2026-10-31 · P3-1 (capture daemon) and a first cut of P3-4 (agent model/harness/trace in `run()`) implemented; P3-2, P3-3 not started
+**Status: draft for decision** · 2026-10-31 (wording checked 2026-11-01) · Shipped: C0, C1 (P3-1 capture daemon), the attestation types `capture` / `operator` of C4 (`attest --type capture`; verifiers report them like other attestations, the facility dashboard of P3-2 and the per-target `capture` report field of §4 are **not** built), and a first cut of P3-4 (agent model/harness/trace in `run()`). C2/C3 (P3-3, hardware-held keys) not started.
 
 ## 1. The gap this closes
 
@@ -40,7 +40,7 @@ C4 is orthogonal to C1–C3 and the cheapest *independent* signal; recommended f
 
 - Capture claims are facts only when the instrument card's attestation verifies against a
   **root the verifier trusts** (`provena trust add tpm-root <fp>`); otherwise notes.
-- New report field `capture` per target: `C0…C4` reached, with the reason the next level was not.
+- New report field `capture` per target: `C0…C4` reached, with the reason the next level was not. *(Design; not yet implemented — today's verifiers list `capture` attestations but do not compute a level.)*
 - `Δ = observed − file_mtime` and `integrated_time − observed` are reported, never interpreted.
 
 ## 5. Milestones
