@@ -19,9 +19,11 @@ Provena 为你的实验保存一本签名的、只增不改的账本：每份数
 ## 2. 准备
 
 ```bash
-pip install "provena[client]"       # 运行 hub 再加 [server]
+pip install "provena-ledger[client]"   # 运行 hub 再加 [server]
 provena keygen --display "Ada Lovelace"
 ```
+
+PyPI 上名为 `provena` 的包是另一个无关项目；请安装 `provena-ledger`（命令和 import 名仍是 `provena`）。
 
 密钥存在 `~/.provena/agents/`（或 `$PROVENA_HOME/agents/`），用口令加密。没有终端时（agent、CI、服务），把口令放进只有你能读的文件，设 `PROVENA_PASSPHRASE_FILE`（或按密钥设 `PROVENA_PASSPHRASE_FILE_<名字>`）；`PROVENA_PASSPHRASE` 也可以，但你的其他进程看得到它。**不要**写在命令行参数里。设置了它们时新建的密钥也会用这个口令。`provena card > ada.card.json` 导出公开身份卡，交给合作者。一台机器上多个身份：`provena --agent 名字 …`（或 `keygen --name 名字`）。
 
@@ -54,7 +56,7 @@ with proj.run("拟合结合曲线", plan="protocol.md", used=["raw/plate1.csv"])
 provena rerun <activity> --yes --attest      # 还原输入、重新执行、比对输出
 ```
 
-`rerun` 会先打印记录的命令和作者，只有加 `--yes` 才执行：命令来自账本，相当于合作者写的代码。有随机性的步骤（随机种子、时间戳、GPU 非确定性）会显示为 `DIFFERS`。加 `--sandbox require` 可在沙箱里运行：断网、读不到你的密钥、主目录与仓库（Linux 用 bubblewrap，macOS 用 `sandbox-exec`；先取消 `PROVENA_PASSPHRASE`）。
+`rerun` 会先打印记录的命令和作者，只有加 `--yes` 才执行：命令来自账本，相当于合作者写的代码。有随机性的步骤（随机种子、时间戳、GPU 非确定性）会显示为 `DIFFERS`。`--sandbox` 默认为 `off`（真实分析常依赖主目录下的工具）；加 `--sandbox require` 可在沙箱里运行：断网、读不到你的密钥、主目录与仓库（Linux 用 bubblewrap，macOS 用 `sandbox-exec`；先取消 `PROVENA_PASSPHRASE`）。
 
 ### 在 Jupyter 里
 
@@ -226,4 +228,4 @@ provena challenge audit leaderboard.pvb --challenge challenge.pvb --hub URL
 
 ## 7. Provena 不证明什么
 
-它不证明数据反映了真实世界。它证明的是**记录**的完整性、作者、顺序与时间。在仪器端签名（设备上的 `instrument` 身份，`provena capture`）能让签名更靠近测量本身，但不能让一个不诚实的实验室变诚实。
+它不证明数据反映了真实世界。它证明的是**记录**的完整性、作者、顺序与时间。在仪器端签名（设备上的 `instrument` 身份，`provena capture`；即 `docs/design/attested-capture.md` 的 C1 级）能让签名更靠近测量本身，但不能让一个不诚实的实验室变诚实。设施可追加 `attest --type capture`（C4 联署），验证器把它当作普通证明报告，尚不给出按目标的采集等级；硬件密钥（C2/C3）未实现。

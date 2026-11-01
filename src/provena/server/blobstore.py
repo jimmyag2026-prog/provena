@@ -81,7 +81,7 @@ class S3BlobStore:
     def __init__(self, bucket: str, *, prefix: str = "provena/", spool_dir: Path,
                  endpoint_url: str | None = None, client=None):
         if client is None:
-            import boto3  # optional dependency: pip install "provena[s3]"
+            import boto3  # optional dependency: pip install "provena-ledger[s3]"
 
             client = boto3.client("s3", endpoint_url=endpoint_url)
         self.client, self.bucket, self.prefix = client, bucket, prefix

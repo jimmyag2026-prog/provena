@@ -16,6 +16,10 @@ Both values ship as **built-in trust** with this release, so `provena verify` re
 `PROVENA_NO_DEFAULT_TRUST=1`, makes the verifier rely only on what you added yourself. Check the
 log key independently before relying on it: `curl -s https://jimmyresearch.com/provena/v1/hub`.
 
+## Unlisted projects
+
+Rehearsal and test projects (the pilot rehearsal, the internal race, hash-named trials) are taken off the front page by the operator (`--unlisted` / `PROVENA_HUB_UNLISTED_PROJECTS`, see `docs/DEPLOY.md`). This is not deletion: the ledger is append-only, every unlisted project still answers at `/p/{pid}` and `/v1/projects/{pid}/…` with its proofs, the witness keeps cosigning it (`GET /v1/catalog?include=unlisted` enumerates them), and the front page counts them ("N private and M unlisted project(s)").
+
 ## The trial witness
 
 A witness keeps the hub honest about history: it remembers the last head it saw of each project

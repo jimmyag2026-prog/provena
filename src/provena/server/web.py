@@ -66,8 +66,10 @@ T = {
     "entries": ("Entries", "条目数"), "last_head": ("Last head", "最新树头"),
     "no_match": ("No matching public projects.", "没有匹配的公开项目。"),
     "no_projects": ("No public projects on this hub yet.", "本 Hub 还没有公开项目。"),
-    "private_count": ("{n} private project(s) are also sequenced here; only their tree heads are "
-                      "public.", "另有 {n} 个私有项目在此排序，只有它们的树头是公开的。"),
+    "private_count": ("{n} private project(s) (only their tree heads are public) and {m} "
+                      "unlisted project(s) (public, reachable by id) are also sequenced here.",
+                      "另有 {n} 个私有项目（只有树头公开）和 {m} 个未列出项目（公开，可按 id 访问）"
+                      "在此排序。"),
     "verdicts": ("What a verdict means", "验证结论的含义"),
     "v_unverified": ("Cryptographically valid, but signed by a log this page does not trust: "
                      "order and times are claims.",
@@ -393,23 +395,30 @@ def _leaderboard_card(hub: Hub, pid: str, state, t) -> str:
 
 # -- what the pages show, as data (GET /v1/catalog, /v1/projects/{pid}/overview) -------------
 
-def catalog(hub: Hub, q: str = "") -> dict:
+def catalog(hub: Hub, q: str = "", include_unlisted: bool = False) -> dict:
     """Public projects (title, tags, license, size, last head time); listings never load
-    project state."""
-    rows, needle, private = [], q.strip().lower(), 0
+    project state. Projects the operator unlisted are counted, not listed (a witness that
+    enumerates the hub asks for them with include_unlisted; they are still public)."""
+    rows, needle, private, unlisted = [], q.strip().lower(), 0, 0
+    hidden = hub.unlisted_projects()
     for row in hub.storage.catalog():
         if row["visibility"] != "public":
             private += 1
             continue
         pid, m = row["project"], row["meta"]
+        if pid in hidden:
+            unlisted += 1
+            if not include_unlisted:
+                continue
         haystack = " ".join([pid, m.get("title", ""), m.get("description", ""),
                              *m.get("tags", [])]).lower()
         if needle and needle not in haystack:
             continue
         head = hub.storage.head(pid)
         rows.append({"project": pid, "meta": m, "size": head["size"] if head else 0,
-                     "time": head["time"] if head else None})
-    return {"projects": rows, "private": private}
+                     "time": head["time"] if head else None, **({"unlisted": True}
+                                                                 if pid in hidden else {})})
+    return {"projects": rows, "private": private, "unlisted": unlisted}
 
 
 def entry_rows(state) -> list[dict]:
@@ -556,8 +565,9 @@ def install(app: FastAPI, hub: Hub) -> None:
                         media_type="application/json")
 
     @app.get("/v1/catalog")
-    def catalog_json(q: str = ""):  # plain JSON already: skip FastAPI's slow re-encoding
-        return Response(json.dumps(catalog(hub, q)), media_type="application/json")
+    def catalog_json(q: str = "", include: str = ""):  # plain JSON already: skip re-encoding
+        listing = catalog(hub, q, include_unlisted=include == "unlisted")
+        return Response(json.dumps(listing), media_type="application/json")
 
     @app.get("/v1/projects/{pid}/overview")
     def overview_json(pid: str):
@@ -607,7 +617,7 @@ def install(app: FastAPI, hub: Hub) -> None:
 
 <h2>{t('public_projects')}</h2>
 {search}{projects}
-<p class="muted">{t('private_count', n=private)}</p>
+<p class="muted">{t('private_count', n=private, m=listing["unlisted"])}</p>
 
 <h2>{t('verdicts')}</h2>
 <div class="card"><dl class="kv">

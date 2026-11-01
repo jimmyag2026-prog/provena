@@ -93,7 +93,7 @@ class _Sql:
     def __init__(self, dsn_or_path):
         self.lock = threading.Lock()
         if isinstance(dsn_or_path, str) and dsn_or_path.startswith("postgres"):
-            import psycopg  # optional dependency: pip install "provena[postgres]"
+            import psycopg  # optional dependency: pip install "provena-ledger[postgres]"
 
             try:
                 self.conn = psycopg.connect(dsn_or_path, autocommit=True)

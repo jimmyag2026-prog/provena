@@ -35,16 +35,16 @@
 |---|---|---|---|
 | 1 | 多写入方并发把作者链分叉 | D、E | **已修 PR #6**（已复现） |
 | 2 | `--content` 被内嵌明文顶替；对未打开的条目给的内容被忽略 | F | **已修 PR #7**（源码确认，阴性对照） |
-| 3 | push 先发条目、后传密文：中断或 429 后，status/doctor 仍报 "in sync / all good"，本地删掉数据就丢了 | E、B、F | 待修 |
-| 4 | 条目被搁置到 `stranded.jsonl`（如与 rotate 并发）时 push 返回 0，status/doctor 不提 | B、F | 待修 |
-| 5 | 从镜像 clone 后可以写入并推到镜像，与主 Hub 分叉；clone 之后也无法改回主 Hub | F | 待修 |
-| 6 | 客户端在核对已固定的 Hub 公钥之前就先写入（创世条目已经进了新 Hub） | E | 待修 |
-| 7 | `add` 接受仓库外的路径和 `.provena/` 内的路径，一旦写入账本，所有人的 checkout 都永久卡在这条 | E | 待修 |
-| 8 | `keygen --name ../evil` 写到 agents 目录之外 | E | 待修 |
-| 9 | `run` 先执行再校验：没有产物的失败 run 有副作用，却没有记录（与 GUIDE 的说法不符） | A | 待修 |
-| 10 | SDK `run(params=)` 含浮点数时整步丢失，并吞掉工具的原异常；没有文件读写的步骤直接不记录 | D | 待修（源码确认浮点数被禁） |
-| 11 | 挑战赛：用第一次提交的旧证明包能绕过"只能提交一次"；`audit --submission` 用别的包也会通过 | C | 待修 |
-| 12 | Hub 用旧备份回滚后，客户端只看到尺寸不一致，doctor 仍报 all good；同一数据目录可以起两个 Hub | F | 待修 |
+| 3 | push 先发条目、后传密文：中断或 429 后，status/doctor 仍报 "in sync / all good"，本地删掉数据就丢了 | E、B、F | **已修**（CHANGELOG 0.2.0 Fixed「Syncs no longer look complete when they are not」：中断的 push 由 `status` 报告并使 `doctor` 失败，push 结束前确认 hub 不缺任何文件） |
+| 4 | 条目被搁置到 `stranded.jsonl`（如与 rotate 并发）时 push 返回 0，status/doctor 不提 | B、F | **已修**（同上：搁置条目使 `push`/`pull` 退出 5，`status`/`doctor` 列出，`provena stranded list|redo`） |
+| 5 | 从镜像 clone 后可以写入并推到镜像，与主 Hub 分叉；clone 之后也无法改回主 Hub | F | **已修**（同上：从镜像 clone 的 checkout 只读并指向主 Hub，`provena remote --rehome`） |
+| 6 | 客户端在核对已固定的 Hub 公钥之前就先写入（创世条目已经进了新 Hub） | E | **已修**（同上：写入任何内容前先核对 hub 日志密钥） |
+| 7 | `add` 接受仓库外的路径和 `.provena/` 内的路径，一旦写入账本，所有人的 checkout 都永久卡在这条 | E | **已修**（CHANGELOG 0.2.0 Fixed「Inputs and non-interactive use」：`add`/`plan` 拒绝仓库外、`.provena/` 内的路径与目录，整批先检查再记录） |
+| 8 | `keygen --name ../evil` 写到 agents 目录之外 | E | **已修**（同上：agent 名限制为 `[A-Za-z0-9._-]`） |
+| 9 | `run` 先执行再校验：没有产物的失败 run 有副作用，却没有记录（与 GUIDE 的说法不符） | A | **已修**（同上：`run` 无声明输入时保留密封 transcript，失败的步骤被记录而不是事后拒绝） |
+| 10 | SDK `run(params=)` 含浮点数时整步丢失，并吞掉工具的原异常；没有文件读写的步骤直接不记录 | D | **已修**（同上：SDK `run(params=)` 先规范化浮点数/大整数/路径/元组，记录失败不吞掉工具异常，无文件的步骤也记录） |
+| 11 | 挑战赛：用第一次提交的旧证明包能绕过"只能提交一次"；`audit --submission` 用别的包也会通过 | C | **已修**（CHANGELOG 0.2.0 Fixed「Challenges: an early snapshot of a team's full log hid a second submission」：`score`/`audit` 取每队证明包之后一位的公开树头；规则下沉 `provena.core.challenge`） |
+| 12 | Hub 用旧备份回滚后，客户端只看到尺寸不一致，doctor 仍报 all good；同一数据目录可以起两个 Hub | F | **已修**（CHANGELOG 0.2.0 Fixed「Syncs no longer look complete」：回滚的 Hub 由 `pull`/`push`/`doctor` 点名并退出 6，`doctor` 核对实时树头尺寸；`hub serve` 拒绝已被另一进程服务的数据目录） |
 
 ### P1：协议层（改规则，Python 与 JS 两个验证器必须同步）
 

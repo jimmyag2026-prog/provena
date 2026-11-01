@@ -20,6 +20,15 @@ from provena.core.witness import verify_cosig
 from provena.server.storage import Storage
 
 
+def parse_project_ids(text: str) -> set[str]:
+    """Project ids separated by commas, whitespace or newlines; `#` starts a comment."""
+    ids = set()
+    for line in text.splitlines():
+        for tok in line.split("#")[0].replace(",", " ").split():
+            ids.add(tok)
+    return ids
+
+
 class NotFound(ProvenaError):
     pass
 
@@ -107,7 +116,21 @@ class Hub:
         self.creators_file = None
         self.projects_per_creator: int | None = None
         self.policy = None  # provena.server.policy.Policy, when the hub runs with --policy
+        # catalog unlisting (operator-side, not deletion): public projects left out of the
+        # listing and its search; their pages, JSON and proofs stay reachable by id
+        self.unlisted: frozenset[str] = frozenset()
+        self.unlisted_file = None  # re-read on every listing, so edit it without restarting
         self._catalog_missing_projects()
+
+    def unlisted_projects(self) -> set[str]:
+        """Ids unlisted by `--unlisted FILE` and/or PROVENA_HUB_UNLISTED_PROJECTS."""
+        ids = set(self.unlisted)
+        if self.unlisted_file is not None:
+            try:
+                ids |= parse_project_ids(self.unlisted_file.read_text())
+            except OSError as exc:  # a lost file lists everything again: log it, keep serving
+                logging.getLogger("provena.hub").error("unlisted file unreadable: %s", exc)
+        return ids
 
     def cosignatures(self, project: str, size: int) -> list[dict]:
         """Cosignatures at *size*; one made before a key rotation carries the head it signed

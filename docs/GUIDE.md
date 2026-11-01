@@ -23,9 +23,11 @@ than when.
 ## 2. Set up
 
 ```bash
-pip install "provena[client]"       # add [server] to run a hub
+pip install "provena-ledger[client]"   # add [server] to run a hub
 provena keygen --display "Ada Lovelace"
 ```
+
+The PyPI package named plain `provena` is an unrelated project; install `provena-ledger` (the command and the import stay `provena`).
 
 The key lives in `~/.provena/agents/` (or `$PROVENA_HOME/agents/`) encrypted with your
 passphrase. Without a terminal (agents, CI, services) put it in a file readable only by you and
@@ -80,8 +82,10 @@ provena rerun <activity> --yes --attest      # rebuild inputs, re-execute, compa
 `rerun` prints the recorded command and its author before doing anything, and only executes with
 `--yes`: the command comes from the ledger, so treat it like code from that collaborator.
 Non-deterministic steps (random seeds, timestamps, GPU nondeterminism) show up as `DIFFERS`.
-Add `--sandbox require` to run it without network or access to your keys, home directory or
-repository (bubblewrap on Linux, `sandbox-exec` on macOS; unset `PROVENA_PASSPHRASE` first).
+`--sandbox` defaults to `off` (real analyses often need tools under your home directory); add
+`--sandbox require` to run it without network or access to your keys, home directory or
+repository (bubblewrap on Linux, `sandbox-exec` on macOS; unset `PROVENA_PASSPHRASE` first), or
+`--sandbox auto` to use one when available.
 
 ### In Jupyter
 
@@ -293,5 +297,8 @@ Register teams as `--team AGENT_ID:PROJECT_ID` (each team's one submission proje
 ## 7. What Provena does not prove
 
 That the data reflects reality. It proves integrity, authorship, order and time of
-*records*. Signing at the instrument (an `instrument` agent key on the device) moves the
-signature closer to the measurement; it does not make a dishonest lab honest.
+*records*. Signing at the instrument (an `instrument` agent key on the device, `provena capture`;
+capture level C1 of `docs/design/attested-capture.md`) moves the signature closer to the
+measurement; it does not make a dishonest lab honest. A facility can add `attest --type capture`
+(the C4 co-signature), which verifiers report like any other attestation; they do not yet state a
+per-target capture level, and hardware-held keys (C2/C3) are not implemented.

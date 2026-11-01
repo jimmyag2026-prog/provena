@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-01
+
+### Changed
+
+- The PyPI distribution is `provena-ledger` (the name `provena` on PyPI belongs to an unrelated project, so `pip install "provena[client]"` installed the wrong thing). The import package and the `provena` command are unchanged; install lines, the GitHub Action template, optional-dependency hints and CI's wheel globs follow. `pyproject` carries the project URLs.
+
+### Added
+
+- Hub catalog unlisting (operator-side, not deletion): `hub serve --unlisted FILE` (project ids, re-read on every listing) and `PROVENA_HUB_UNLISTED_PROJECTS` (comma-separated) leave public projects out of the catalog listing and its search on `/`, `/classic` and `GET /v1/catalog`; the front page counts them ("N private and M unlisted project(s) are also sequenced here"). Pages, JSON, proofs and cosignatures stay reachable by id; `GET /v1/catalog?include=unlisted` lists them flagged `"unlisted": true`, which the trial witness uses so unlisted logs keep being watched.
+- `SECURITY.md` (supported versions, how to report, scope) and `CONTRIBUTING.md` (dev setup, PR rules, where docs live).
+
+### Fixed
+
+- Docs agree with the repository again: the 0.2.0 release notes carry a dated note that the Provena License exists; `next-dev-plan.md` no longer says the licence is undecided or the witness secrets deferred; `agent-ux-review.md` marks P0 #3–12 fixed with the CHANGELOG lines that fixed them; `rerun` docs say `--sandbox` defaults to `off` (`require` for a no-network, no-keys rerun); capture assurance wording states what ships (C0/C1; C4 as an `attest --type capture` entry the verifier reports like any attestation, without a per-target capture level yet; C2/C3 not started).
+
+
 ## [0.2.0] - 2026-10-31
 
 ### Added

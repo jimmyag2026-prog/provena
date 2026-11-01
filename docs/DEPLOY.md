@@ -20,7 +20,7 @@ integrity: authors still hold their ciphertext locally and can `push` again.
 ## PostgreSQL (optional)
 
 ```bash
-pip install "provena[server,client,postgres]"
+pip install "provena-ledger[server,client,postgres]"
 export PROVENA_HUB_DATABASE_URL=postgresql://provena@db.internal/provena   # password via ~/.pgpass
 provena hub serve --data /var/lib/provena
 ```
@@ -32,7 +32,7 @@ the log key and, unless S3 is configured, the ciphertext.
 ## Object storage (optional)
 
 ```bash
-pip install "provena[server,client,s3]"
+pip install "provena-ledger[server,client,s3]"
 export AWS_ACCESS_KEY_ID=… AWS_SECRET_ACCESS_KEY=…   # or an instance role / ~/.aws config
 provena hub serve --data /var/lib/provena --s3-bucket lab-hub \
     --s3-endpoint https://sgp1.digitaloceanspaces.com
@@ -45,11 +45,13 @@ hash-checked on the hub before an object is written. SQLite metadata and the log
 ## Run
 
 ```bash
-pip install "provena[server,client]"            # or: docker build -t provena-hub .
+pip install "provena-ledger[server,client]"     # or: docker build -t provena-hub .
 export PROVENA_HUB_PASSPHRASE_FILE=/etc/provena/hub_pass   # 0600; never on the command line
 provena hub serve --data /var/lib/provena --host 127.0.0.1 --port 8740 \
     --tsa https://freetsa.org/tsr --anchor-interval 600
 ```
+
+The PyPI package named plain `provena` is an unrelated project; install `provena-ledger` (the command and the import stay `provena`).
 
 Writes are rate-limited per client address (`--writes-per-minute`; project creation 20/hour, burst 10); `--max-projects` caps the hub's total number of projects. Keys cost nothing to make, so a hub reachable from the internet should also restrict who may create projects: `--creators FILE` (agent ids, one per line, `#` comments; re-read on every creation, a missing file admits nobody) and `--projects-per-creator N`. For a shared hub use `--policy FILE` instead (ADR 0012): orgs with their agent ids, `max_projects`, `max_bytes` and API keys (stored as hashes; `provena hub api-key ORG` makes one), plus an optional `default` for agents in no org:
 
@@ -60,6 +62,8 @@ Writes are rate-limited per client address (`--writes-per-minute`; project creat
 ```
 
 The file is re-read when it changes; one that does not parse admits nobody and accepts no new uploads. On a policy hub a project is created only by a signed request from an agent of the org it is charged to (mirror a project there from a checkout of that org). Org admins read their usage with `GET /v1/orgs/ORG/usage` and `Authorization: Bearer KEY`. The hub database carries a schema version and migrates forward at start; it refuses to run against a database written by a newer Provena. Existing projects keep accepting their members' writes either way. For a mirror, list the project owners' ids (the genesis author), not the member who runs `provena mirror`; behind a reverse proxy add `--behind-proxy` so limits apply to the real client (only if the proxy overwrites `X-Forwarded-For`).
+
+**Unlisting (not deletion).** The ledger is append-only and witnesses check every log, so a rehearsal or test project cannot be removed. It can be taken off the front page: `--unlisted FILE` (project ids, one per line, `#` comments; re-read on every listing, so edit it without restarting) and/or `PROVENA_HUB_UNLISTED_PROJECTS=<id>,<id>` leave those public projects out of the catalog listing and its search (`/`, `/classic`, `GET /v1/catalog`), counted in the "N private and M unlisted project(s)" line. Their pages, JSON, proofs and witness cosignatures stay reachable by id (`/p/{pid}`, `/v1/projects/{pid}/…`), and `GET /v1/catalog?include=unlisted` lists them (flagged `"unlisted": true`) for witnesses that enumerate the hub, as the trial witness does.
 
 Heads are re-anchored every `--reanchor-days` (default 30) so old anchors survive a weakened hash or TSA (ADR 0008).
 

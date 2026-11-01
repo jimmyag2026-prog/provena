@@ -8,12 +8,12 @@
 
 ## 进度（2026-10-31，/goal 完成）
 
-决定（用户）：名字保持 Provena；许可证以后再定；试验区 Hub 部署在 DO 服务器；其余按本方案默认；争取这一版接入 Spark Research（已接入并自动记账）；试点先办内部赛（已跑通）；见证人已上线；外部组织方试点留待以后。
+决定（用户）：名字保持 Provena；许可证已定为 Provena License（见 §5 第 3 项）；试验区 Hub 部署在 DO 服务器；其余按本方案默认；争取这一版接入 Spark Research（已接入并自动记账）；试点先办内部赛（已跑通）；见证人已上线；外部组织方试点留待以后。
 
 | 阶段 | 状态 | PR |
 |---|---|---|
 | Phase 0 止血 | **完成**：输入/口令文件/无 traceback、同步如实报告、挑战赛只能提交一次、chunk 封顶、裸装可验证、agent_flows 进 CI；独立审查 9 条全修 | #10–#13、#15 |
-| Phase 1 改名/许可 | 按决定跳过（名字不改；许可证待定） | — |
+| Phase 1 改名/许可 | 名字不改；许可证已定为 Provena License（根目录 `LICENSE`，2026-10-31 公开时加入） | — |
 | Phase 2 agent 契约 | **完成**：`--json` 信封、退出码 0–7、口令文件、幂等、`#N`/前缀/路径引用、结构化 verify、`--json-lines`；两次 agent 复测后打磨 | #14、#16、#18 |
 | Phase 3 协议 v2 | **完成**：ADR 0009 rules 2（rewrap/`--history`、可证明的步骤、补发密钥）、`rules.json` 单源、同一路径冲突 + `resolve` | #17、#26 |
 | Phase 4 agent 入口 | **完成**：`provena mcp`、SDK `record`/`verify`、in-toto/DSSE、`--badge`、GitHub Action；**Spark Research 已真实接入**（spark-research #130 修三处外部 MCP 缺口 + V74 测试隔离泄漏；#131 每个任务与工具调用自动记账、每轮推送一次） | #19、#20 |
@@ -213,7 +213,7 @@
 | Phase 2 agent 契约 | 1.5 周 | Phase 0 | 规范可以先写 |
 | Phase 3 协议 v2 | 2 周 | Phase 2；§5 第 5 项 | ADR 可以先写 |
 | Phase 4 MCP / SDK | 2.5 周 | Phase 2；activity v2 依赖 Phase 3 | — |
-| Phase 5 挑战赛服务 | **完成**：`challenge status`/`join`、榜单排序；**DO 试验区** `https://jimmyresearch.com/provena` 上线（RFC 3161 锚定），PILOT 合成数据彩排跑通；挑战规则下沉 `provena.core.challenge` + Hub 榜单逐行核对（#34）；Hub 组织/配额/API key + schema 迁移（ADR 0012，#36）；外部见证人 GitHub Actions 就绪（#39）；PILOT 默认决定 + 组织方手册（#41）；**内部赛试点跑通**（iris 真实数据、3 队、外部审计 OK，#43）。用户决定暂缓：见证人 secrets 由用户日后设置；外部组织方试点由用户日后选定 | #21–#23、#34、#36、#39、#41、#43 |
+| Phase 5 挑战赛服务 | **完成**：`challenge status`/`join`、榜单排序；**DO 试验区** `https://jimmyresearch.com/provena` 上线（RFC 3161 锚定），PILOT 合成数据彩排跑通；挑战规则下沉 `provena.core.challenge` + Hub 榜单逐行核对（#34）；Hub 组织/配额/API key + schema 迁移（ADR 0012，#36）；外部见证人 GitHub Actions 每小时联署试验区全部公开项目（#39/#45，2026-10-31 已上线）；PILOT 默认决定 + 组织方手册（#41）；**内部赛试点跑通**（iris 真实数据、3 队、外部审计 OK，#43）。外部组织方试点由用户日后选定 | #21–#23、#34、#36、#39、#41、#43 |
 | Phase 6 Proof Reader | 3 周 | Phase 3、5 | — |
 
 合计约 12–13 周，与 v2 报告的估算一致。差别在于 Phase 0 和 2 是新插入的，用来替代 v2 V0 里零散的 UX 修补。

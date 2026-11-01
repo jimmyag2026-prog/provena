@@ -17,6 +17,8 @@ install -d -o provena -g provena -m 700 /home/provena/hub-data
 ( umask 077; openssl rand -base64 32 > /home/provena/hub.pass ); chown provena:provena /home/provena/hub.pass
 # who may create projects: agent ids, one per line
 install -o provena -g provena -m 644 /dev/null /home/provena/creators.txt
+# projects taken off the front page (ids, one per line); must exist before the hub starts
+install -o provena -g provena -m 644 /dev/null /home/provena/unlisted.txt
 python3 /home/provena/provena/deploy/do/caddy-provena.py && caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
 ```
 
@@ -32,3 +34,9 @@ ssh root@<hub-server> /home/provena/provena/deploy/do/deploy.sh --expect "$(git 
 Append the agent id (`provena card | jq -r .id`) to `/home/provena/creators.txt` (re-read on every
 creation, no restart). Publish the hub's log key (`curl -s https://jimmyresearch.com/provena/v1/hub`)
 so readers can `provena trust add log <id>` after checking it.
+
+## Unlist a rehearsal project
+
+Nothing is deleted from a hub (the ledger is append-only and the witness checks every log). To
+take a test project off the front page, append its id to `/home/provena/unlisted.txt` (the unit
+already passes `--unlisted`; one id per line, `#` comments; re-read on every listing, so no restart). See `docs/DEPLOY.md`.

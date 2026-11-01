@@ -3,13 +3,18 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "provena"
+name = "provena-ledger"
 dynamic = ["version"]
 description = "A ledger of experimental data and process, kept encrypted and backed by proof."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
 dependencies = ["cryptography>=42"]
+
+[project.urls]
+Homepage = "https://sparkscience.xyz/provena/"
+Source = "https://github.com/jimmyag2026-prog/provena"
+Changelog = "https://github.com/jimmyag2026-prog/provena/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 server = ["fastapi>=0.110", "uvicorn>=0.29"]

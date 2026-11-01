@@ -334,7 +334,7 @@ def test_pages_have_json_twins(tmp_path):
     assert http.get(f"/v1/projects/{'0' * 64}/overview").status_code == 404
 
     http2, repo2, _ = _hub_with(tmp_path / "priv", "private")
-    assert http2.get("/v1/catalog").json() == {"projects": [], "private": 1}
+    assert http2.get("/v1/catalog").json() == {"projects": [], "private": 1, "unlisted": 0}
     private = http2.get(f"/v1/projects/{repo2.state.project}/overview").json()
     assert "entries" not in private and private["meta"] == {}
 
@@ -415,3 +415,66 @@ def test_the_spa_is_the_front_end_and_classic_pages_stay(tmp_path):
     private = http2.get(f"/v1/projects/{repo2.state.project}/entries/"
                         f"{repo2.state.order[0]}").json()
     assert "entry" not in private and private["kind"] == "genesis"
+
+
+def test_unlisted_project_leaves_catalog_but_stays_reachable(tmp_path, monkeypatch):
+    """Operator-side unlisting (0.2.1): out of the listing and its search, still served by id
+    with proofs — the ledger is append-only, so nothing is deleted."""
+    from provena.server.hub import parse_project_ids
+
+    http, repo, alice = _hub_with(tmp_path, "public")
+    pid = repo.state.project
+    secrets = builders.ContentSecrets(b"\0" * 32, b"\0" * 32, b"\0" * 32)
+    repo.append(builders.plan(repo.state, alice, {"commitment": "ab" * 32}, secrets, title="x"))
+    sync.push(repo, HubClient("http://testserver", agent=alice, http=http), agent=alice)
+    hub = http.app.state.hub
+    assert [p["project"] for p in http.get("/v1/catalog").json()["projects"]] == [pid]
+
+    # the file form (re-read on every listing) and the env/static form both apply
+    unlisted = tmp_path / "unlisted.txt"
+    unlisted.write_text(f"# rehearsal projects\n{pid}   # pilot\n")
+    hub.unlisted_file = unlisted
+    assert hub.unlisted_projects() == {pid}
+    assert parse_project_ids("a, b\nc # d") == {"a", "b", "c"}
+
+    listing = http.get("/v1/catalog").json()
+    assert listing == {"projects": [], "private": 0, "unlisted": 1}
+    assert http.get("/v1/catalog", params={"q": "x"}).json()["projects"] == []
+    page = http.get("/classic").text
+    assert pid[:16] not in page and "1 unlisted project(s) (public, reachable by id)" in page
+    # a witness enumerating the hub still sees it (public), flagged
+    full = http.get("/v1/catalog", params={"include": "unlisted"}).json()["projects"]
+    assert [p["project"] for p in full] == [pid] and full[0]["unlisted"] is True
+    # everything addressed by id is untouched
+    assert http.get(f"/v1/projects/{pid}").json()["visibility"] == "public"
+    assert http.get(f"/v1/projects/{pid}/overview").json()["head"]["size"] == 2
+    assert http.get(f"/classic/p/{pid}").status_code == 200
+    assert http.get(f"/p/{pid}").status_code == 200
+    consistency = http.get(f"/v1/projects/{pid}/proofs/consistency",
+                           params={"first": 1, "second": 2}).json()
+    assert consistency["proof"]
+    assert http.get(f"/v1/projects/{pid}/proofs/inclusion",
+                    params={"index": 0, "size": 2}).json()["proof"]
+
+    unlisted.unlink()  # a lost file lists everything again, with a log line, not a 500
+    assert http.get("/v1/catalog").json()["unlisted"] == 0
+
+
+def test_hub_serve_reads_unlisted_setting(tmp_path, monkeypatch):
+    """`--unlisted FILE` and PROVENA_HUB_UNLISTED_PROJECTS reach the hub from `hub serve`."""
+    import uvicorn
+
+    from provena.cli.main import main
+
+    captured = {}
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kw: captured.setdefault("app", app))
+    monkeypatch.setenv("PROVENA_HUB_PASSPHRASE", "pw")
+    monkeypatch.setenv("PROVENA_HUB_UNLISTED_PROJECTS", "aa" * 32 + ", " + "bb" * 32)
+    f = tmp_path / "unlisted.txt"
+    f.write_text("cc" * 32 + "\n")
+    assert main(["hub", "serve", "--data", str(tmp_path / "hub"), "--unlisted", str(f),
+                 "--anchor-interval", "0"]) == 0
+    hub = captured["app"].state.hub
+    assert hub.unlisted_projects() == {"aa" * 32, "bb" * 32, "cc" * 32}
+    assert main(["hub", "serve", "--data", str(tmp_path / "hub2"),
+                 "--unlisted", str(tmp_path / "missing.txt")]) != 0
