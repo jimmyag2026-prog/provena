@@ -441,7 +441,7 @@ def test_unlisted_project_leaves_catalog_but_stays_reachable(tmp_path, monkeypat
     assert listing == {"projects": [], "private": 0, "unlisted": 1}
     assert http.get("/v1/catalog", params={"q": "x"}).json()["projects"] == []
     page = http.get("/classic").text
-    assert pid[:16] not in page and "0 private and 1 unlisted project(s)" in page
+    assert pid[:16] not in page and "1 unlisted project(s) (public, reachable by id)" in page
     # a witness enumerating the hub still sees it (public), flagged
     full = http.get("/v1/catalog", params={"include": "unlisted"}).json()["projects"]
     assert [p["project"] for p in full] == [pid] and full[0]["unlisted"] is True
