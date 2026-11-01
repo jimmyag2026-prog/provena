@@ -31,9 +31,11 @@ facility co-signatures raise that bar.
 ## Install
 
 ```bash
-pip install "provena[client]"               # CLI + SDK
-pip install "provena[client,server]"        # + run a hub (add s3 / postgres extras as needed)
+pip install "provena-ledger[client]"               # CLI + SDK
+pip install "provena-ledger[client,server]"        # + run a hub (add s3 / postgres extras as needed)
 ```
+
+The PyPI package named plain `provena` is an unrelated project; install `provena-ledger` (the command and the import stay `provena`).
 
 ## Quickstart
 

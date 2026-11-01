@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - run: uv build
-      - run: uv venv /tmp/pkg && uv pip install -p /tmp/pkg/bin/python "$(ls dist/*.whl)[client,server]"
+      - run: uv venv /tmp/pkg && uv pip install -p /tmp/pkg/bin/python "$(ls dist/provena_ledger-*.whl)[client,server]"
       # the core alone (no [client]/[server]) records, proves and verifies offline
       - run: |
-          uv venv /tmp/bare && uv pip install -p /tmp/bare/bin/python "$(ls dist/*.whl)"
+          uv venv /tmp/bare && uv pip install -p /tmp/bare/bin/python "$(ls dist/provena_ledger-*.whl)"
           export PROVENA_HOME=/tmp/bare/home PROVENA_PASSPHRASE=x PROVENA_SCRYPT_N=1024
           mkdir /tmp/bare/p && cd /tmp/bare/p && echo a > a.txt
           /tmp/bare/bin/provena keygen && /tmp/bare/bin/provena init --name bare

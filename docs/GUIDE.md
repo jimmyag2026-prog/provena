@@ -23,9 +23,11 @@ than when.
 ## 2. Set up
 
 ```bash
-pip install "provena[client]"       # add [server] to run a hub
+pip install "provena-ledger[client]"   # add [server] to run a hub
 provena keygen --display "Ada Lovelace"
 ```
+
+The PyPI package named plain `provena` is an unrelated project; install `provena-ledger` (the command and the import stay `provena`).
 
 The key lives in `~/.provena/agents/` (or `$PROVENA_HOME/agents/`) encrypted with your
 passphrase. Without a terminal (agents, CI, services) put it in a file readable only by you and

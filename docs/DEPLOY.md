@@ -20,7 +20,7 @@ integrity: authors still hold their ciphertext locally and can `push` again.
 ## PostgreSQL (optional)
 
 ```bash
-pip install "provena[server,client,postgres]"
+pip install "provena-ledger[server,client,postgres]"
 export PROVENA_HUB_DATABASE_URL=postgresql://provena@db.internal/provena   # password via ~/.pgpass
 provena hub serve --data /var/lib/provena
 ```
@@ -32,7 +32,7 @@ the log key and, unless S3 is configured, the ciphertext.
 ## Object storage (optional)
 
 ```bash
-pip install "provena[server,client,s3]"
+pip install "provena-ledger[server,client,s3]"
 export AWS_ACCESS_KEY_ID=… AWS_SECRET_ACCESS_KEY=…   # or an instance role / ~/.aws config
 provena hub serve --data /var/lib/provena --s3-bucket lab-hub \
     --s3-endpoint https://sgp1.digitaloceanspaces.com
@@ -45,11 +45,13 @@ hash-checked on the hub before an object is written. SQLite metadata and the log
 ## Run
 
 ```bash
-pip install "provena[server,client]"            # or: docker build -t provena-hub .
+pip install "provena-ledger[server,client]"     # or: docker build -t provena-hub .
 export PROVENA_HUB_PASSPHRASE_FILE=/etc/provena/hub_pass   # 0600; never on the command line
 provena hub serve --data /var/lib/provena --host 127.0.0.1 --port 8740 \
     --tsa https://freetsa.org/tsr --anchor-interval 600
 ```
+
+The PyPI package named plain `provena` is an unrelated project; install `provena-ledger` (the command and the import stay `provena`).
 
 Writes are rate-limited per client address (`--writes-per-minute`; project creation 20/hour, burst 10); `--max-projects` caps the hub's total number of projects. Keys cost nothing to make, so a hub reachable from the internet should also restrict who may create projects: `--creators FILE` (agent ids, one per line, `#` comments; re-read on every creation, a missing file admits nobody) and `--projects-per-creator N`. For a shared hub use `--policy FILE` instead (ADR 0012): orgs with their agent ids, `max_projects`, `max_bytes` and API keys (stored as hashes; `provena hub api-key ORG` makes one), plus an optional `default` for agents in no org:
 

@@ -19,9 +19,11 @@ Provena 为你的实验保存一本签名的、只增不改的账本：每份数
 ## 2. 准备
 
 ```bash
-pip install "provena[client]"       # 运行 hub 再加 [server]
+pip install "provena-ledger[client]"   # 运行 hub 再加 [server]
 provena keygen --display "Ada Lovelace"
 ```
+
+PyPI 上名为 `provena` 的包是另一个无关项目；请安装 `provena-ledger`（命令和 import 名仍是 `provena`）。
 
 密钥存在 `~/.provena/agents/`（或 `$PROVENA_HOME/agents/`），用口令加密。没有终端时（agent、CI、服务），把口令放进只有你能读的文件，设 `PROVENA_PASSPHRASE_FILE`（或按密钥设 `PROVENA_PASSPHRASE_FILE_<名字>`）；`PROVENA_PASSPHRASE` 也可以，但你的其他进程看得到它。**不要**写在命令行参数里。设置了它们时新建的密钥也会用这个口令。`provena card > ada.card.json` 导出公开身份卡，交给合作者。一台机器上多个身份：`provena --agent 名字 …`（或 `keygen --name 名字`）。
 
