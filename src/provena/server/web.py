@@ -66,9 +66,10 @@ T = {
     "entries": ("Entries", "条目数"), "last_head": ("Last head", "最新树头"),
     "no_match": ("No matching public projects.", "没有匹配的公开项目。"),
     "no_projects": ("No public projects on this hub yet.", "本 Hub 还没有公开项目。"),
-    "private_count": ("{n} private and {m} unlisted project(s) are also sequenced here; only "
-                      "their tree heads are public.",
-                      "另有 {n} 个私有项目和 {m} 个未列出项目在此排序，只有它们的树头是公开的。"),
+    "private_count": ("{n} private project(s) (only their tree heads are public) and {m} "
+                      "unlisted project(s) (public, reachable by id) are also sequenced here.",
+                      "另有 {n} 个私有项目（只有树头公开）和 {m} 个未列出项目（公开，可按 id 访问）"
+                      "在此排序。"),
     "verdicts": ("What a verdict means", "验证结论的含义"),
     "v_unverified": ("Cryptographically valid, but signed by a log this page does not trust: "
                      "order and times are claims.",
